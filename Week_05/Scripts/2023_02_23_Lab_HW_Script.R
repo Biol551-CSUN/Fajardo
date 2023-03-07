@@ -57,6 +57,8 @@ ggplot(full_data,
        color = "Variables")+
   scale_color_manual(values = c("blue", "orange"))+
   theme_light()
+ggsave(here("Week_05","Output","2023_02_23_lab_hw_graph.png"))
+
 #I was attempting to add depth on the line graph as well but couldn't.
 #I got error "Error: Continuous value supplied to discrete scale" 
 #Tried to make mean depth as a factor in code but rendered a weird graph. 

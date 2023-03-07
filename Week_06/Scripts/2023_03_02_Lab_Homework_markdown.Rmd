@@ -1,0 +1,67 @@
+---
+title: "2023_03_02_Lab_Homework"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: rmdformats::readthedown
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      messge = FALSE,
+                      fig.path = "../Output/")
+```
+# Welcome
+*Hello* and welcome to my super awesome R markdown. In this file you will find
+
+-  **Plot of Chemical Data**
+-  **Table of Averaged Values per Variable in Chemical Data**
+
+I hope you find my page fun and interesting. _Toodles_
+
+# Load Libraries
+Loading libraries that I need to make my beautiful graph and table
+```{r}
+knitr::opts_chunk$set(message = FALSE)
+library(here)
+library(tidyverse)
+library(palmerpenguins)
+library(lubridate)
+library(devtools)
+library(kableExtra)
+library(memer)
+```
+
+# Chemical Data Plot
+I decided to make a facet wrapped box plots of the Chemical data. The plot describes the all of the values of the different variables collected separated by seasons.
+```{r Homework plot}
+ChemData <- read_csv(here("Week_04","Data","chemicaldata_maunalua.csv")) #read data in
+ChemData_long <- ChemData %>% #name chem data
+  drop_na() %>% #drop na's
+  pivot_longer(cols = Temp_in:percent_sgd, #pivot long
+               names_to = "Variables", #give name to new column with variable names
+               values_to = "Values") %>% # give name to column with values
+  select(Site, Season, Variables, Values) #select data I want
+
+ggplot(ChemData_long, #datframe used
+       aes(x = Season, #x axis
+           y = Values, #y axis
+           color = Season))+ #color by season
+  geom_boxplot()+ #box plot
+  facet_wrap(~Variables, scales = "free")+ #facet wrap box plot
+  theme_dark()+ #dark background
+  labs(title = "Values of Different Varibales Across Two Seasons") #labels
+```
+
+# Chemical Data Table
+In this section I have listed a table of all of the average values for all of the variables 
+```{r Homework Table}
+ChemData_long %>% #use long chem data I made
+  group_by(Variables) %>% # group by variable
+  summarise(Average_values = mean(Values, na.rm = TRUE)) %>% #summarise all values for variables
+  kbl(caption = "Averaged Values per Variable") %>% #add title to table
+  kable_styling(full_width = FALSE) %>% #make table smaller
+  row_spec(c(1,3,5,7), background = "pink")# make it a kable table #add color to every other row
+```
+

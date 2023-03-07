@@ -1,0 +1,49 @@
+---
+title: "2023_03_02_Markdown_Practice"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "../Output/")
+```
+
+# Load Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(palmerpenguins)
+library(lubridate)
+library(devtools)
+library(kableExtra)
+library(memer)
+```
+
+# Make a Plot
+```{r penguin, fig.asp=1.2, fig.align='center', fig.cap="This is my first penguin figure", echo=FALSE}
+ggplot(penguins,
+         aes(x = bill_depth_mm,
+           y = bill_length_mm,
+           color = species))+
+  geom_point()
+```
+| Time | Session | Topic |
+|:----:|:-------:|:-----:|
+|_left_|_center_|_right_|
+|01:00|1|Anatomy|
+
+
+```{r kable}
+penguins %>%
+  group_by(species) %>%
+  summarise(billmean = mean(bill_length_mm, na.rm = TRUE)) %>%
+  kbl() %>% 
+  kable_classic() %>% 
+  row_spec(2, bold = T, color = "white", background = "red") %>% 
+  kable_styling(full_width = FALSE)# make it a kable table
+```
+
