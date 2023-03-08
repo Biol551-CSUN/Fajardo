@@ -1,0 +1,118 @@
+#Intro to Maps Script
+#Created by: Cindy Fajardo
+#Created on: 2023_03_07
+
+#Load libraries
+library(tidyverse)
+library(here)
+
+
+#Load data
+popdata<-read_csv(here("Week_07","Data","CApopdata.csv"))
+stars<-read_csv(here("Week_07","Data","stars.csv"))
+
+#Data from entire world
+world<-map_data("world")
+head(world)
+
+#Data from USA
+usa<-map_data("usa")
+head(usa)
+
+#Data from Italy
+italy<-map_data("italy")
+head(italy)
+
+#Data from states
+states<-map_data("state")
+head(states)
+
+#Data from counties
+counties<-map_data("county")
+head(counties)
+
+#plot of whole world with mercator
+ggplot()+
+  geom_polygon(data = world, 
+               aes(x = long, 
+                   y = lat, 
+                   group = group,
+                   fill = region),
+               color = "black") + 
+  guides(fill = FALSE) +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue")) +
+  coord_map(projection = "mercator",
+            xlim = c(-180,180))
+
+#plot of whole world using sinusodial
+ggplot()+
+  geom_polygon(data = world, 
+               aes(x = long,
+                   y = lat,
+                   group = group, 
+                   fill = region),
+               color = "black")+
+  theme_minimal()+
+  guides(fill = FALSE)+
+  theme(panel.background = element_rect(fill = "lightblue"))+
+  coord_map(projection = "sinusoidal",
+            xlim = c(-180,180))
+
+#map of Cali
+CA_data<-states %>%
+  filter(region == "california")
+
+ggplot()+
+  geom_polygon(data = CA_data, 
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               color = "black")+
+  coord_map()+
+  theme_void()
+
+# Look at the county data
+head(counties)[1:3,] # only showing the first 3 rows for space
+
+# Look at the county data
+head(popdata)
+
+#wrangle data to join
+CApop_county<-popdata %>%
+  select("subregion" = County, Population)  %>% # rename the county col
+  inner_join(counties) %>%
+  filter(region == "california") # some counties have same names in other states
+head(CApop_county)
+
+#plot of cali showing population
+ggplot()+
+  geom_polygon(data = CApop_county, 
+               aes(x = long, 
+                   y = lat, 
+                   group = group,
+                   fill = Population),
+               color = "black")+
+  coord_map()+
+  theme_void()+
+  scale_fill_gradient(trans = "log10") #log tranform data for better gradient
+
+head(stars)
+
+#Map of CA population by county with seastars
+ggplot()+
+  geom_polygon(data = CApop_county, 
+               aes(x = long, 
+                   y = lat, 
+                   group = group,
+                   fill = Population),  
+               color = "black")+
+  geom_point(data = stars, # add a point at all my sites 
+             aes(x = long, 
+                 y = lat,
+                 size = star_no))+ #Make points proportional to number of stars.
+  coord_map()+
+  theme_void() +
+  scale_fill_gradient(trans = "log10")+
+  labs(size = "# stars/m2") #Make a better legend label
+ggsave(here("Week_07","Output","CApop.pdf"))
