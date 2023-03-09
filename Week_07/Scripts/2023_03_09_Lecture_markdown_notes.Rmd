@@ -23,7 +23,6 @@ library(tidyverse)
 library(here)
 library(ggsn)
 library(emojifont)
-register_google(key = "AIzaSyDy4dZ675IcOI8hIqCsoWeV8E4QYVSfduI")
 ```
 
 # Load Data
