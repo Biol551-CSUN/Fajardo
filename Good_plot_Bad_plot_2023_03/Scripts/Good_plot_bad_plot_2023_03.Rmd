@@ -2,7 +2,7 @@
 title: "Good_plot_Bad_plot_2023_03"
 author: "Cindy Fajardo"
 date: "`r Sys.Date()`"
-output: html_document
+output: hrbrthemes::ipsum
 ---
 
 ```{r setup, include=FALSE}
@@ -51,10 +51,8 @@ Let's begin with the bad plot. I used a grouped bar plot. I then grouped the dat
 -  The background color of the legend is bright green in contrast to the plot color which is purple.  
 -  The axis labels are terrible
 ```{r, Bad Plot}
-img <- image_read("https://plus.unsplash.com/premium_photo-1677507321876-28a220a7249f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80")
+img <- image_read("https://plus.unsplash.com/premium_photo-1677507321876-28a220a7249f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80") #download image
 
-img %>% 
-  image_scale("400")
 
 tbi_year %>% 
   group_by(type, year) %>% 

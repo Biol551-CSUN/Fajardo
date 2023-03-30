@@ -2,7 +2,7 @@
 title: "2023_03_02_Lab_Homework"
 author: "Cindy Fajardo"
 date: "`r Sys.Date()`"
-output: rmdformats::readthedown
+output: hrbrthemes::ipsum
   
 ---
 
