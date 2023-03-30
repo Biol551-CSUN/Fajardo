@@ -1,0 +1,96 @@
+---
+title: "Good_plot_Bad_plot_2023_03"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.path = "../Output/")
+```
+
+# Welcome
+In this file you will find a good plot and a bad plot of data that was collected for Traumatic Brain Injuries. There are a total of three csv files, but I used the csv file that shows observations of different ways people were observed to get brain injuries over the years and how the injury was observed (death, hospitalization, emergency room visit). Hope you enjoy!
+
+# Libraries
+```{r, Libraries}
+library(here)
+library(tidyverse)
+library(lubridate)
+library(devtools)
+library(ggplot2)
+library(ggridges)
+library(viridis)
+library(hrbrthemes)
+library(forcats)
+library(nationalparkcolors)
+library(ggpubr)
+library(jpeg)
+library(magick)
+library(imager)
+library(jpeg)
+
+```
+
+# Read in data
+```{r, Data}
+tbi_age <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-24/tbi_age.csv')
+tbi_year <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-24/tbi_year.csv')
+tbi_military <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-24/tbi_military.csv')
+```
+
+
+# Bad plot
+Let's begin with the bad plot. I used a grouped bar plot. I then grouped the data by type (how the injury was observed), and year and then I summarized the data by averaging the number of injuries observed. The ways I violated the graph was:  
+-  Misleading title: The title states dumb ways to die, but the graph represents three types of brain injuries observations, not just death.  
+-  I used a photo of a brain for the background of the plot which makes it really ugly.  
+-  The axis labels for years are in half years so 2007.5, which doesn't make any sense.  
+-  The background color of the legend is bright green in contrast to the plot color which is purple.  
+-  The axis labels are terrible
+```{r, Bad Plot}
+img <- image_read("https://plus.unsplash.com/premium_photo-1677507321876-28a220a7249f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80")
+
+img %>% 
+  image_scale("400")
+
+tbi_year %>% 
+  group_by(type, year) %>% 
+  summarise(mean_number_est = mean(number_est, na.rm = TRUE)) %>% 
+  ggplot(aes(fill = type,
+             y = mean_number_est,
+             x = year)) +
+  annotation_custom(grid::rasterGrob(img
+                                     , width = unit(1, "npc")
+                                     , height = unit(1, "npc"))) +
+  geom_bar(position="dodge", stat="identity")+
+  ggtitle("Dumb Ways To Die")+
+  theme(plot.title = element_text(color="yellow", size=20, face="bold.italic"),
+        plot.background = element_rect(fill = "purple"),
+        legend.background = element_rect(fill = "green"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+```
+
+# Good Plot
+Now we are in the good plot. I used **geom density ridges gradient** to show how often the type of injuries were observed in 2008. I attempted to change the transparency of the ridges, but the scale color used wouldn't allow for the alpha to work. I could have used **geom density ridges** and alpha would have worked, but visually, I prefer this one.
+```{r, Good Plot}
+tbi_year %>% 
+  filter(year == 2008) %>% 
+  filter(injury_mechanism != "Total") %>% 
+ggplot(aes(x = number_est, 
+           y = injury_mechanism, 
+           fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_fill_viridis(name = "Observations", option = "C") +
+  labs(title = 'Different Types of Traumatic Brain Injuries in 2008')+
+  ylab("")+
+  xlab("Estimated Observations")+
+  theme(plot.title.position = "plot",
+        axis.text.y = element_text(size = 8,),
+        axis.text.x = element_text(size = 6))
+```
+
