@@ -1,0 +1,137 @@
+---
+title: "2023_04_04_Lecture_notes"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.path = "../Output/")
+```
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+library(PNWColors) # for the PNW color palette 
+library(emokid)
+
+```
+
+```{r, tibble}
+df <- tibble::tibble(
+  a = rnorm(10), # draws 10 random values from a normal distribution
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+head(df)
+```
+
+# Rescale every column individually
+Anytime you have to do a task more then once...
+Let's use an example where we want to rescale data in multiple columns (value - min/(max - min))
+```{r, Rescale}
+df<-df %>%
+  mutate(a = (a-min(a, na.rm = TRUE))/(max(a, na.rm = TRUE)-min(a, na.rm = TRUE)),
+         b = (b-min(b, na.rm = TRUE))/(max(b, na.rm = TRUE)-min(b, na.rm = TRUE)),
+         c = (c-min(c, na.rm = TRUE))/(max(c, na.rm = TRUE)-min(c, na.rm = TRUE)),
+         d = (d-min(d, na.rm = TRUE))/(max(d, na.rm = TRUE)-min(d, na.rm = TRUE)))
+```
+
+# Lets Make a Function
+```{r}
+f_to_c <- function(temp_F) {temp_C <- (temp_F - 32) * 5 / 9 #need to have space between ) and {
+return(temp_C) #press enter before typing out return
+} #this squigly bracket needs to be out here, not next to the paranthesis for return, if not it won't work
+```
+
+# Think, Pair, Share
+```{r}
+c_to_k <- function(temp_C) {temp_K <- (temp_C + 273.15)
+return(temp_K)
+}
+```
+
+# Making plots into a function
+```{r}
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+ggplot(penguins, aes(x = body_mass_g, y = bill_length_mm, color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+
+#Name and set-up the function
+cindys_plot<-function(data, x, y){ 
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+
+```
+
+# Adding defualts
+```{r, Adding defualts}
+myplot<-function(data = penguins, x, y){
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+```
+
+
+# Layering the plot
+```{r, Layering the plot}
+myplot(x = body_mass_g, y = flipper_length_mm)+
+  labs(x = "Body mass (g)",
+       y = "Flipper length (mm)")
+```
+
+
+# Add an if-else statement for more flexibility.
+```{r}
+a <- 4
+b <- 5
+if (a > b) { # my question
+  f <- 20 # if it is true give me answer 1
+    } else { # else give me answer 2
+  f <- 10
+}
+```
+
+
+# If else plotting
+```{r}
+myplot<-function(data = penguins, x, y, lines=TRUE ){ # add new argument for lines
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+if(lines==TRUE){
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+else{
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+}
+
+# With lines
+myplot(x = body_mass_g, y = flipper_length_mm)
+
+# Without lines
+myplot(x = body_mass_g, y = flipper_length_mm, lines = FALSE)
+```
+
