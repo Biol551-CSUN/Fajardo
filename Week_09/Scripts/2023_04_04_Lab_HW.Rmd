@@ -39,7 +39,7 @@ return(lenght_mm)
 }
 
 surf_perch %>% 
-  mutate(male_size_mm = cm_to_mm(male_size)) #used it wih surf perch data
+  mutate(male_size_mm = cm_to_mm(male_size)) #used it with surf perch data
 
 snail_data %>% 
   mutate(lenght_mm = cm_to_mm(Length)) #used it with snail data
@@ -49,19 +49,20 @@ cm_to_mm(48)
 ```
 
 # Lets make a plot function
+I will be using the algae csv file and the snail data. To create the function, I used the algae data file. I took the log of the surface area to help shrink the numbers as this will be used as the y of the graph. It was only used to help with aesthetics. But the function itself does not require for any of the arguments to be transformed   
 ```{r, Plot Function}
 algea_clean <- algea_data %>% 
-  mutate(log_Surface_area = log(Surface_area)) #took log of surface area to make numbers smaller
+  mutate(log_Surface_area = log(Surface_area)) #took log of surface area to make numbers smaller as this will be used for y in the graph
 
-bubble_plot <- function(data, x, y, size, color){ #named plot function and set data that needs to be inputed into function
+bubble_plot <- function(data, x, y, size, color){ #named plot function and set parameters that need to be used for the function
 park_colors<-park_palette("BlueRidgePkwy") #made my palette
 
 ggplot(algea_clean, #data used
        aes(x = {{x}}, #what x could be
            y = {{y}}, #what y could be
-           size = {{size}}, #what size could be
+           size = {{size}}, #what size of bubble could be
            color = {{color}}))+ #what color could be
-  geom_point(alpha=0.5, shape=19)+ #changed shape and transparancy 
+  geom_point(alpha=0.5, shape=19)+ #changed shape and transparency 
   scale_size(range = c(.1, 24))+ # add bubbles
   scale_color_manual("BlueRidgePkwy", values=park_colors, guide=FALSE)+   # use pretty colors and change the legend title
   theme_ipsum()+ # chose ipsum theme
@@ -70,5 +71,7 @@ ggplot(algea_clean, #data used
   labs(title = "Bubble Graph") #added title
 }
 bubble_plot(data = algea_clean, x = Height, y = log_Surface_area, size = Volume, color = Site)
+
+bubble_plot(data = snail_data, x = Length, y = Weight, size = Snail, color = Location) #I keep getting an error here, saying that "Length" can't be found as an object, even though I know it is. 
 ```
 
