@@ -37,8 +37,14 @@ get_map() is the function to get a basemap from Google Maps. At it's simplest fo
 Use ggmap to plot the base layer
 
 ```{r Oahu}
+register_google(key = "AIzaSyDy4dZ675IcOI8hIqCsoWeV8E4QYVSfduI")
 Oahu<-get_map("Oahu")
 ggmap(Oahu)
+
+geocode("California")
+CA<-data.frame(lon = -119.4179, lat = 36.77826)
+Cali<-get_map(CA)
+ggmap(Cali)
 ```
 # Get coordinates for Wailupe on Oahu
 
