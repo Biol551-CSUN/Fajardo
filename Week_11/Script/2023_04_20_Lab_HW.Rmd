@@ -1,0 +1,53 @@
+---
+title: "2023_04_20_Lab_HW"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.path = "../Output/")
+```
+
+# Libraries
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+library(tidytext)
+library(ggplot2)
+```
+
+# Load Data
+```{r}
+intertidal <- read_csv(here("Week_11","Data","intertidaldata.csv")) # read in intertidal data
+```
+
+# Data Wrangling
+```{r}
+intertidal_clean <- intertidal %>% 
+  clean_names() %>% # clean the column names
+  mutate(quadrat = str_replace_all(quadrat, pattern = "[0-9]|\\W|\\.", replacement = ""))%>% #delete spaces and deleted and numbers
+  mutate(quadrat = factor(quadrat, levels = c("Low","Mid","High"))) %>% #make quadrat factors and rearrange the levels
+  select(site, transect, quadrat, mussels) %>% #selected sites, transets, quadrat, and mussels
+  group_by(quadrat, site) %>% #grouped by quadrat and by site
+  summarise(mean_mussels = (mean(mussels))) #took average of mussels count
+  
+```
+
+#plot
+```{r}
+intertidal_clean %>% 
+  ggplot(aes(x =quadrat,
+             y = mean_mussels,
+             fill = quadrat))+
+  geom_col()+ #to make bar chart
+  labs(title = "Average Mussel Count in Different Sites Across California Coast",
+       x = "Quadrat",
+       y = "Average Mussel Count",
+       color = "Quadrat")
+```
+

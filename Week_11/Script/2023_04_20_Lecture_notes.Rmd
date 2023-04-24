@@ -1,0 +1,121 @@
+---
+title: "2023_04_20_Lecture_notes"
+author: "Cindy Fajardo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+```{r, Libraries}
+library(tidyverse)
+library(here)
+```
+
+# Load Data
+```{r}
+income_mean <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_mean.csv')
+```
+
+# What is a factor
+```{r}
+fruits<-factor(c("Apple", "Grape", "Banana"))
+fruits
+```
+
+# factor booby-traps!
+```{r}
+test<-c("A", "1", "2")
+as.numeric(test)
+test<-factor(test) # covert to factor
+as.numeric(test)
+```
+# Forecats Starwars
+```{r, starwars}
+starwars %>% 
+  filter(!is.na(species)) %>% # remove the NAs
+  count(species, sort = TRUE)
+star_counts<-starwars %>%
+  filter(!is.na(species)) %>%
+  mutate(species = fct_lump(species, n = 3)) %>%
+  count(species)
+
+star_counts
+
+star_counts %>%
+  ggplot(aes(x = species, y = n))+
+  geom_col()
+```
+
+# reordering factors
+```{r}
+star_counts %>%
+  ggplot(aes(x = fct_reorder(species, n), y = n))+ # reorder the factor of species by n
+  geom_col()
+
+star_counts %>%
+  ggplot(aes(x = fct_reorder(species, n, .desc = TRUE), y = n))+ # reorder the factor of species by n in descending order
+  geom_col() +
+  labs(x = "Species")
+```
+
+# We will make a plot of the total income by year and quantile across all dollar types.
+```{r}
+total_income<-income_mean %>%
+  group_by(year, income_quintile)%>%
+  summarise(income_dollars_sum = sum(income_dollars))%>%
+  mutate(income_quintile = factor(income_quintile)) # make it a factor
+
+total_income%>%
+ggplot(aes(x = year, y = income_dollars_sum, color = income_quintile))+
+  geom_line()
+
+#We can reorder line plots by using fct_reorder2, which reorders the data by two variables
+total_income%>%
+  ggplot(aes(x = year, y = income_dollars_sum, 
+             color = fct_reorder2(income_quintile,year,income_dollars_sum)))+
+  geom_line()+
+  labs(color = "income quantile")
+```
+
+# reorder levels directly in a vector because I said so
+```{r}
+x1 <- factor(c("Jan", "Mar", "Apr", "Dec"))
+x1
+
+#This order is probably not what we want... You can set the specific order of the levels
+x1 <- factor(c("Jan", "Mar", "Apr", "Dec"), levels = c("Jan", "Mar", "Apr", "Dec"))
+x1
+```
+
+# subest data with factors
+Back to starwars. Let's say we instead of grouping our species that have < 3 counts into "Other" we just filter them out.
+```{r}
+starwars_clean<-starwars %>% 
+  filter(!is.na(species)) %>% # remove the NAs
+  count(species, sort = TRUE) %>%
+  mutate(species = factor(species)) %>% # make species a factor
+  filter(n>3) %>% # drop extra levels# only keep species that have more than 3
+  droplevels() 
+starwars_clean
+
+# Check the levels of the factor
+levels(starwars_clean$species)
+```
+
+# recode levels
+If you want to rename (or recode) a level. For example, lets recode Human to Humanoid.
+```{r}
+starwars_clean<-starwars %>% 
+  filter(!is.na(species)) %>% # remove the NAs
+  count(species, sort = TRUE) %>%
+  mutate(species = factor(species)) %>% # make species a factor 
+  filter(n>3)  %>% # only keep species that have more than 3 
+  droplevels() %>% # drop extra levels 
+  mutate(species = fct_recode(species, "Humanoid" = "Human")) # this renames
+starwars_clean
+```
+
